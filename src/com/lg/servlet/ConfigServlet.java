@@ -1,9 +1,11 @@
 package com.lg.servlet;
 
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -12,16 +14,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Servlet implementation class SysTimeServlet
+ * Servlet implementation class ConfigServlet
  */
-@WebServlet("/SysTimeServlet")
-public class SysTimeServlet extends HttpServlet {
+@WebServlet("/ConfigServlet")
+public class ConfigServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public SysTimeServlet() {
+    public ConfigServlet() {
         super();
     }
 
@@ -29,10 +31,24 @@ public class SysTimeServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SS");
-		String date = sdf.format(new Date());
+		InputStream is = getServletContext().getResourceAsStream("/config.xml");
+		InputStreamReader isr = new InputStreamReader(is, "UTF-8");
+		BufferedReader br = new BufferedReader(isr);
 		PrintWriter pw = response.getWriter();
-		pw.append(date);
+		String line;
+		while((line = br.readLine()) != null){
+			pw.append(line);
+		}
+		
+		if (is != null) {
+			is.close();
+		}
+		if (isr != null) {
+			isr.close();
+		}
+		if (br != null) {
+			br.close();
+		}
 	}
 
 	/**
