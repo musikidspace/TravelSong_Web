@@ -1,9 +1,12 @@
 package com.lg.filter;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URLDecoder;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -13,7 +16,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
+import com.lg.dao.JDBCManager;
 
 /**
  * Servlet Filter implementation class CookiesCheckingFilter
@@ -38,13 +42,38 @@ public class CookieCheckingFilter implements Filter {
 	 */
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
+		PrintWriter pw = response.getWriter();
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
-
 		String cookie = httpRequest.getHeader("Cookie");
-		//TODO �����ݿ�cookie�Ƚ�
-		if(cookie != null){
-			PrintWriter pw = response.getWriter();
-			pw.append(URLDecoder.decode(cookie, "UTF-8"));
+		// 如果头文件中没有cookie，需重新登录
+		if (cookie == null || cookie.equals("null") || cookie.equals("")) {
+			pw.append("{\"data\":\"cookie is null\",\"success\":true,\"sts\":\"checkingfilter\"}");
+			return;
+		}
+		String cookieverify = null;
+		String usercode = httpRequest.getParameter("usercode");
+		try {
+			String sql = "select cookieverify from cookies where usercode = ?";
+			Connection conn = JDBCManager.getInstance().getConncetion();
+			if (conn != null) {
+				PreparedStatement psm = conn.prepareStatement(sql);
+				psm.setString(1, "github");
+				ResultSet rs = psm.executeQuery();
+				while (rs.next()) {
+					cookieverify = rs.getString(1);
+				}
+				rs.close();
+				psm.close();
+			}
+		} catch (SQLException e) {
+		}
+		// 本地有，数据库中没有cookie信息，已退出登录（未清除本地cookie）
+		if (cookieverify == null || cookieverify.equals("null") || cookieverify.equals("")) {
+			pw.append("{\"data\":\"remote cookie is null\",\"success\":true,\"sts\":\"checkingfilter\"}");
+			return;
+		}
+		if (!cookie.equals(cookieverify)) {
+			pw.append("{\"data\":\"the two cookies are different\",\"success\":true,\"sts\":\"checkingfilter\"}");
 			return;
 		}
 		// pass the request along the filter chain
