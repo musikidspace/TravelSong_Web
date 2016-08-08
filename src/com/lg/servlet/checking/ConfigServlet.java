@@ -1,4 +1,4 @@
-package com.lg.servlet;
+package com.lg.servlet.checking;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -38,11 +38,12 @@ public class ConfigServlet extends HttpServlet {
 		InputStreamReader isr = new InputStreamReader(is, "UTF-8");
 		BufferedReader br = new BufferedReader(isr);
 		PrintWriter pw = response.getWriter();
+		pw.append("{\"data\":{");
 		String line;
 		while ((line = br.readLine()) != null) {
 			pw.append(line);
 		}
-
+		pw.append("},\"success\":true,\"sts\":\"config\"}");
 		MyCloseUtils.doClose(is, isr, br);
 	}
 

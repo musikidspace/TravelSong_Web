@@ -5,7 +5,7 @@ public class UserCookie {
 	private String cookieverify;
 	private long expires;
 	private String path;
-	private String Purpose;
+	private String purpose;
 	private String createtime;
 	public String getUsercode() {
 		return usercode;
@@ -32,10 +32,10 @@ public class UserCookie {
 		this.path = path;
 	}
 	public String getPurpose() {
-		return Purpose;
+		return purpose;
 	}
 	public void setPurpose(String purpose) {
-		Purpose = purpose;
+		purpose = purpose;
 	}
 	public String getCreatetime() {
 		return createtime;

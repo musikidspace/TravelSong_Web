@@ -47,7 +47,7 @@ public class CookieCheckingFilter implements Filter {
 		String cookie = httpRequest.getHeader("Cookie");
 		// 如果头文件中没有cookie，需重新登录
 		if (cookie == null || cookie.equals("null") || cookie.equals("")) {
-			pw.append("{\"data\":\"cookie is null\",\"success\":true,\"sts\":\"checkingfilter\"}");
+			pw.append("{\"data\":{\"msg\":\"cookie is null\"},\"success\":false,\"sts\":\"checking\"}");
 			return;
 		}
 		String cookieverify = null;
@@ -57,7 +57,7 @@ public class CookieCheckingFilter implements Filter {
 			Connection conn = JDBCManager.getInstance().getConncetion();
 			if (conn != null) {
 				PreparedStatement psm = conn.prepareStatement(sql);
-				psm.setString(1, "github");
+				psm.setString(1, usercode);
 				ResultSet rs = psm.executeQuery();
 				while (rs.next()) {
 					cookieverify = rs.getString(1);
@@ -65,15 +65,19 @@ public class CookieCheckingFilter implements Filter {
 				rs.close();
 				psm.close();
 			}
-		} catch (SQLException e) {
+		} catch (Exception e) {
+			pw.append("{\"data\":{\"msg\":\"")
+			.append(e.getMessage())
+			.append("\"},\"success\":false,\"sts\":\"checking\"}");
+			return;
 		}
 		// 本地有，数据库中没有cookie信息，已退出登录（未清除本地cookie）
 		if (cookieverify == null || cookieverify.equals("null") || cookieverify.equals("")) {
-			pw.append("{\"data\":\"remote cookie is null\",\"success\":true,\"sts\":\"checkingfilter\"}");
+			pw.append("{\"data\":{\"msg\":\"remote cookie is null\"},\"success\":false,\"sts\":\"checking\"}");
 			return;
 		}
 		if (!cookie.equals(cookieverify)) {
-			pw.append("{\"data\":\"the two cookies are different\",\"success\":true,\"sts\":\"checkingfilter\"}");
+			pw.append("{\"data\":{\"msg\":\"the two cookies are different\"},\"success\":false,\"sts\":\"checking\"}");
 			return;
 		}
 		// pass the request along the filter chain
