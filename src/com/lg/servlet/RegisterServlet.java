@@ -47,14 +47,19 @@ public class RegisterServlet extends HttpServlet {
 		PreparedStatement psm;
 		ResultSet rs;
 		boolean phoneFlag = true;
-		if(userpe.contains("@")){
+		if (user == null || userpe == null || userpassword == null) {
+			pw.append("{\"data\":{\"msg\":\"").append("param is null")
+					.append("\"},\"success\":false,\"sts\":\"register\"}");
+			return;
+		}
+		if (userpe.contains("@")) {
 			phoneFlag = false;
 		}
-		
+
 		String qsql = "select 1 from user where usercode = ?";
 		Connection conn = JDBCManager.getInstance().getConncetion();
 		try {
-			//判断用户名是否已存在
+			// 判断用户名是否已存在
 			psm = conn.prepareStatement(qsql);
 			psm.setString(1, user);
 			rs = psm.executeQuery();
@@ -63,8 +68,8 @@ public class RegisterServlet extends HttpServlet {
 						.append("\"},\"success\":false,\"sts\":\"register\"}");
 				return;
 			}
-			//判断用户手机号或邮箱是否已存
-			if(phoneFlag){
+			// 判断用户手机号或邮箱是否已存
+			if (phoneFlag) {
 				qsql = "select 1 from user where userphone = ?";
 				psm = conn.prepareStatement(qsql);
 				psm.setString(1, userpe);
@@ -85,7 +90,7 @@ public class RegisterServlet extends HttpServlet {
 					return;
 				}
 			}
-			
+
 			if (phoneFlag) {
 				qsql = "insert into user (usercode, userphone, userpassword) values (?, ? ,?)";
 			} else {
