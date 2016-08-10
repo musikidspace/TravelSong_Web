@@ -46,8 +46,8 @@ public class LoginServlet extends HttpServlet {
 		String userpassword = request.getParameter("userpassword");
 		String sql = "select usercode, username, userphone, useremail, usergender, userhead,"
 				+ " userlvl, userbirthday, userlocation, userdesc, userplatform, userpermission"
-				+ " from user where userstatus <> 0 and userpassword = ?"
-				+ " and (usercode = ? or userphone = ? or useremail = ?)";
+				+ " from user where userstatus <> 0 and userpassword = ? collate utf8_bin"
+				+ " and (usercode = ? collate utf8_bin or userphone = ? or useremail = ? collate utf8_bin)";
 		Connection conn = JDBCManager.getInstance().getConncetion();
 		try {
 			PreparedStatement psm = conn.prepareStatement(sql);
