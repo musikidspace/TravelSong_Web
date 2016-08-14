@@ -7,12 +7,25 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import com.lg.api.UserAPI;
+import com.lg.api.comm.BodyWrapper;
+import com.lg.api.comm.EasemobRestAPI;
+import com.lg.api.comm.HTTPMethod;
+import com.lg.api.comm.HeaderHelper;
+import com.lg.api.comm.HeaderWrapper;
+import com.lg.api.comm.ResponseWrapper;
+import com.lg.api.comm.body.IMUserBody;
 import com.lg.bean.ResultMsg;
 import com.lg.bean.User;
 import com.lg.dao.JDBCManager;
 
-public class UserAPIImpl implements UserAPI {
-
+public class UserAPIImpl extends EasemobRestAPI implements UserAPI {
+	private static final String ROOT_URI = "/users";
+	
+	@Override
+	public String getResourceRootURI() {
+		return ROOT_URI;
+	}
+	
 	@Override
 	public Object createNewUserSingle(boolean phoneFlag, Object payload) {
 		User user = (User) payload;
@@ -60,9 +73,17 @@ public class UserAPIImpl implements UserAPI {
 			}
 			return result;
 		}
+		
 		result.setData(user);
 		result.setSuccess(true);
 		result.setSts("register");
+		//用户环信注册
+		IMUserBody userBody = new IMUserBody(user.getUsercode(), user.getUserpassword());
+		String url = getContext().getSeriveURL() + getResourceRootURI();
+		BodyWrapper body = (BodyWrapper) userBody;
+		HeaderWrapper header = HeaderHelper.getDefaultHeaderWithToken();
+		ResponseWrapper responseWrapper = getInvoker().sendRequest(HTTPMethod.METHOD_POST, url, header, body, null);
+		System.out.println(responseWrapper.toString());
 		try {
 			if(psm != null){
 				psm.close();

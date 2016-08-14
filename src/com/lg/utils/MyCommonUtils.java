@@ -1,14 +1,12 @@
 package com.lg.utils;
 
 import java.security.MessageDigest;
-import java.util.UUID;
-
-import com.mysql.fabric.xmlrpc.base.Data;
 
 public class MyCommonUtils {
 
 	/**
 	 * MD5值
+	 * 
 	 * @param paramString
 	 * @return
 	 */
@@ -23,7 +21,7 @@ public class MyCommonUtils {
 			return paramString;
 		}
 	}
-	
+
 	/**
 	 * 将指定byte数组转换成16进制字符串
 	 * 
@@ -41,4 +39,5 @@ public class MyCommonUtils {
 		}
 		return hexString.toString();
 	}
+	
 }

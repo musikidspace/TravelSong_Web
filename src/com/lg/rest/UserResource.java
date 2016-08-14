@@ -1,4 +1,4 @@
-package com.lg.resources;
+package com.lg.rest;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,6 +25,9 @@ import javax.ws.rs.core.MediaType;
 
 import com.google.gson.Gson;
 import com.lg.api.UserAPI;
+import com.lg.api.comm.ClientContext;
+import com.lg.api.comm.EasemobRestAPIFactory;
+import com.lg.api.comm.body.IMUserBody;
 import com.lg.api.impl.UserAPIImpl;
 import com.lg.bean.ResultMsg;
 import com.lg.bean.User;
@@ -56,7 +59,9 @@ public class UserResource {
 			String[] params = ins.split("&");
 			mp = new HashMap<>();
 			for (String param : params) {
-				mp.put(param.split("=")[0], param.split("=")[1]);
+				if (param.split("=").length > 1) {
+					mp.put(param.split("=")[0], param.split("=")[1]);
+				}
 			}
 			
 		} catch (IOException e) {
@@ -107,13 +112,15 @@ public class UserResource {
 	 * @return
 	 */
 	@POST
-	@Path("/code")
+	@Path("/codepwd")
 	@Consumes("application/x-www-form-urlencoded")
 	@Produces(value = MediaType.APPLICATION_JSON)
 	public String register(@Context HttpServletRequest request, @Context HttpServletResponse response) {
 		Map<String, String> mp = null;
 		ResultMsg result = new ResultMsg();
-		UserAPI userApi = new UserAPIImpl();
+		//初始化环信context
+		EasemobRestAPIFactory factory = ClientContext.getInstance().init(ClientContext.INIT_FROM_PROPERTIES).getAPIFactory();
+		UserAPI userApi = (UserAPI)factory.newInstance(EasemobRestAPIFactory.USER_CLASS);
 		Gson gson = new Gson();
 		PreparedStatement psm = null;
 		ResultSet rs = null;
@@ -220,6 +227,7 @@ public class UserResource {
 				user.setUseremail(userpe);
 			}
 			user.setUserpassword(userpassword);
+			//注册用户
 			result = (ResultMsg) userApi.createNewUserSingle(phoneFlag, user);
 		}catch (Exception e){
 			e.printStackTrace();
