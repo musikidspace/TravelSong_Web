@@ -1,7 +1,7 @@
 package com.lg.bean;
 
 public class User {
-	private int userid;
+	private Integer userid;
 	private String usercode;
 	private String username;
 	private String userphone;
@@ -19,7 +19,7 @@ public class User {
 	private int createmode;
 	private String createdate;
 	private String modifydate;
-	public int getUserid() {
+	public Integer getUserid() {
 		return userid;
 	}
 	public String getUsercode() {
@@ -73,7 +73,7 @@ public class User {
 	public String getModifydate() {
 		return modifydate;
 	}
-	public void setUserid(int userid) {
+	public void setUserid(Integer userid) {
 		this.userid = userid;
 	}
 	public void setUsercode(String usercode) {
